@@ -6,8 +6,7 @@ Mayuri Albal (ma4197) <br>
 
 ### **Title**:
 
-In-depth Analysis of Emma Sexton’s Marathon Training for the New York
-City 2022 Marathon
+In-depth Analysis of Emma Sexton’s New York City 2022 Marathon Training
 
 ### **Motivation**:
 
