@@ -4,18 +4,18 @@ Gwyneth Wei (gw2442); Emma Sexton (els2250); Olivia Wang (hw2852);
 Mayuri Albal (ma4197) <br>
 2022-11-10
 
-**Title**:
+### **Title**:
 
 In-depth Analysis of Emma Sexton’s Marathon Training for the New York
 City 2022 Marathon
 
-**Motivation**:
+### **Motivation**:
 
 Our motivation for this project is to analyze Emma’s training habits fro
 the New York City Marathon to better inform Emma in her future endeavors
 and to prevent future injuries.
 
-**Intended Final Products**:
+### **Intended Final Products**:
 
 -   Generation of Emma’s performance throughout the NYC Marathon
     (November 6th, 2022)
@@ -26,12 +26,12 @@ and to prevent future injuries.
 -   Website demonstrating the statistics and graphing models of Emma’s
     training leading up to the marathon and during the marathon
 
-**Anticipated data sources**:
+### **Anticipated data sources**:
 
 Data from Strava.com tracked by Garmin watch from March 31st to November
 6th
 
-**The planned analysis/visualizations/coding challenges**:
+### **The planned analysis/visualizations/coding challenges**:
 
 -   Analysis of marathon training reigmen prior to the race
 
@@ -52,7 +52,7 @@ Data from Strava.com tracked by Garmin watch from March 31st to November
 
 -   Visualization of marathon map and her run
 
-**The planned timeline**:
+### **The planned timeline**:
 
 November 12
 
