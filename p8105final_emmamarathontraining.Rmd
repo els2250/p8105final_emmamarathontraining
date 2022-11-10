@@ -1,0 +1,11 @@
+---
+title: "P8105 Final Proposal"
+author: "Gwyneth Wei (gw2442); Emma Sexton (els2250); Olivia Wang (hw2852); Mayuri Albal (ma4197) <br>"
+date: "2022-11-10"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
