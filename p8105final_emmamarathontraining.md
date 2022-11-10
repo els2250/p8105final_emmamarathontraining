@@ -14,8 +14,7 @@ her future endeavors and to prevent future injuries.
 =======
 ### **Title**:
 
-In-depth Analysis of Emma Sexton’s Marathon Training for the New York
-City 2022 Marathon
+In-depth Analysis of Emma Sexton’s New York City 2022 Marathon Training
 
 ### **Motivation**:
 
