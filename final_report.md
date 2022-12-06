@@ -160,6 +160,12 @@ include walks and other activities (elliptical or biking)
 
 #### Exploratory Analysis: Visualizations, summaries, and exploratory statistical analyses. Justify the steps you took, and show any major changes to your ideas.
 
+-   Mileage over time (Intro)
+-   Mapping running trails (plotly/gis(?))
+-   Temperature vs average speed/average heart rate/relative effort
+-   Elevation vs average speed/relative effort
+-   Dashboard with all our plots
+
 <br/>
 
 #### Additional Analysis: If you undertake formal statistical analyses, describe these in detail
