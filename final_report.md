@@ -31,16 +31,8 @@ package, data was imported into R.
 
 ##### *Importing Data*
 
-Since each Garmin activity was downloaded as an individual FIT file, a
-function was created to iterate across the multiple activities and
-compile a single data frame. As shown below, the function was created to
-read each activity FIT file into R and pull out the records (which
-included data on latitude and longitude, distance, speed, heart rate,
-and cadence), and then each second of activity was merged into a single
-data frame. This function was applied to a list of all file names. A
-`for` loop was used to generate a list of data frames, and then rows
-were merged using `bind_rows` to create the final data frame,
-`marathon_df`.
+First, we imported the summary data of all of Emma’s training runs from
+July 23, 2020…
 
 ``` r
 library(tidyverse)
@@ -60,31 +52,67 @@ library(FITfileR)
 ```
 
 ``` r
-data_import <- function(list_data) {
-  
-  garmin_data <- readFitFile(list_data)
-  
-  garmin_activities_df <- records(garmin_data) %>% 
-    bind_rows() %>% 
-    arrange(timestamp)
-  
-  garmin_activities_df
-  
-}
+training_summary <- read_csv("activities/activities.csv") %>% 
+  janitor::clean_names()
+```
 
-garmin_fitfiles <- "activities/fit_files/garmin_data_"
+    ## New names:
+    ## Rows: 335 Columns: 84
+    ## ── Column specification
+    ## ──────────────────────────────────────────────────────── Delimiter: "," chr
+    ## (6): Activity Date, Activity Name, Activity Type, Activity Description,... dbl
+    ## (49): Activity ID, Elapsed Time...6, Distance...7, Max Heart Rate...8, R... lgl
+    ## (29): Commute...10, Athlete Weight, Bike Weight, Average Positive Grade,...
+    ## ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
+    ## Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    ## • `Elapsed Time` -> `Elapsed Time...6`
+    ## • `Distance` -> `Distance...7`
+    ## • `Max Heart Rate` -> `Max Heart Rate...8`
+    ## • `Relative Effort` -> `Relative Effort...9`
+    ## • `Commute` -> `Commute...10`
+    ## • `Elapsed Time` -> `Elapsed Time...15`
+    ## • `Distance` -> `Distance...17`
+    ## • `Max Heart Rate` -> `Max Heart Rate...30`
+    ## • `Relative Effort` -> `Relative Effort...37`
+    ## • `Commute` -> `Commute...50`
 
-list_of_fitfiles <- str_c(garmin_fitfiles, c("1":"329"), ".fit")
+Since each Garmin activity was downloaded as an individual FIT file, a
+function was created to iterate across the multiple activities and
+compile a single data frame. As shown below, the function was created to
+read each activity FIT file into R and pull out the records (which
+included data on latitude and longitude, distance, speed, heart rate,
+and cadence), and then each second of activity was merged into a single
+data frame. This function was applied to a list of all file names. A
+`for` loop was used to generate a list of data frames, and then rows
+were merged using `bind_rows` to create the final data frame,
+`marathon_df`.
 
-n = 329
-datalist = list()
-datalist = vector("list", length = n)
-
-for (i in 1:n) {
-  datalist[[i]] <- data_import(list_of_fitfiles[i])
-}
-
-marathon_df <- bind_rows(datalist)
+``` r
+# data_import <- function(list_data) {
+# 
+#   garmin_data <- readFitFile(list_data)
+# 
+#   garmin_activities_df <- records(garmin_data) %>%
+#     bind_rows() %>%
+#     arrange(timestamp)
+# 
+#   garmin_activities_df
+# 
+# }
+# 
+# garmin_fitfiles <- "activities/fit_files/garmin_data_"
+# 
+# list_of_fitfiles <- str_c(garmin_fitfiles, c("1":"329"), ".fit")
+# 
+# n = 329
+# datalist = list()
+# datalist = vector("list", length = n)
+# 
+# for (i in 1:n) {
+#   datalist[[i]] <- data_import(list_of_fitfiles[i])
+# }
+# 
+# marathon_df <- bind_rows(datalist)
 ```
 
 ##### *Data Cleaning*
