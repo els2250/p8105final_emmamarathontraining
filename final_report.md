@@ -39,7 +39,7 @@ library(tidyverse)
 ```
 
     ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
-    ## ✔ ggplot2 3.3.6      ✔ purrr   0.3.5 
+    ## ✔ ggplot2 3.3.6      ✔ purrr   0.3.4 
     ## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
     ## ✔ tidyr   1.2.0      ✔ stringr 1.4.1 
     ## ✔ readr   2.1.2      ✔ forcats 0.5.2 
@@ -53,7 +53,23 @@ library(FITfileR)
 
 ``` r
 training_summary <- read_csv("activities/activities.csv") %>% 
-  janitor::clean_names()
+  janitor::clean_names() %>%
+  filter(activity_type == "Run") %>%
+  select(activity_id, activity_date, activity_name, activity_description, elapsed_time_6, distance_7, max_heart_rate_8, relative_effort_9, max_speed, average_speed, elevation_gain, elevation_loss, max_grade, average_grade, max_cadence, average_cadence, average_heart_rate, calories, weather_temperature, dewpoint, humidity, wind_speed) %>%
+  filter (activity_id >= 6910869137) %>%
+  separate(activity_date, c("month_date", "year", "time"), sep = ", ") %>%
+  mutate(
+    date = str_c(month_date, year, sep = " "),
+    date = as.Date(date, format = "%b%d%Y")
+  ) %>%
+  select(-month_date, -year) %>%
+  mutate(
+    elapsed_time_min = elapsed_time_6 / 60,
+    distance_km = distance_7,
+    max_heart_rate = max_heart_rate_8,
+    relative_effort = relative_effort_9
+  ) %>%
+  select(-elapsed_time_6, -distance_7, -max_heart_rate_8, -relative_effort_9)
 ```
 
     ## New names:
@@ -75,6 +91,17 @@ training_summary <- read_csv("activities/activities.csv") %>%
     ## • `Max Heart Rate` -> `Max Heart Rate...30`
     ## • `Relative Effort` -> `Relative Effort...37`
     ## • `Commute` -> `Commute...50`
+
+``` r
+activity_summaries =
+  training_summary %>%
+  select(activity_id, date, time, activity_name, activity_description)
+
+tidy_training = 
+  training_summary %>%
+  select(-activity_name, -activity_description) %>%
+  select(activity_id, date, time, distance_km, elapsed_time_min, max_speed, average_speed, max_heart_rate, average_heart_rate, relative_effort, everything())
+```
 
 Since each Garmin activity was downloaded as an individual FIT file, a
 function was created to iterate across the multiple activities and
