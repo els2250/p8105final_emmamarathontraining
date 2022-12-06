@@ -114,13 +114,15 @@ data frame. This function was applied to a list of all file names. A
 were merged using `bind_rows` to create the final data frame,
 `marathon_df`.
 
-*Cleaning* After importing, the data frame was then cleaned to include
-activities from the start of marathon training (March 31, 2022) to the
-day of the New York City Marathon (November 6, 2022). Within the
-‘activities’ data set, there were 335 observations and 84 variables. The
-data was filtered to only include observations from ‘activity_type’ that
-were classified as ‘Run’. From this, 22 variables were selected to be
-included in this data set: activity_id, activity_date, activity_name,
+##### *Data Cleaning*
+
+After importing, the data frame was then cleaned to include activities
+from the start of marathon training (March 31, 2022) to the day of the
+New York City Marathon (November 6, 2022). Within the ‘activities’ data
+set, there were 335 observations and 84 variables. The data was filtered
+to only include observations from ‘activity_type’ that were classified
+as ‘Run’. From this, 22 variables were selected to be included in this
+data set: activity_id, activity_date, activity_name,
 activity_description, elapsed_time_6, distance_7, max_heart_rate_8,
 relative_effort_9, max_speed, average_speed, elevation_gain,
 elevation_loss, max_grade, average_grade, max_cadence, average_cadence,
