@@ -29,40 +29,48 @@ knitr::opts_chunk$set(echo = TRUE)
 Data was collected using the Garmin Forerunner 245 activity watch from August 17, 2020 to November 6, 2022. Collected data was uploaded to Strava.com after each activity. After granting permission, personal data was downloaded from Strava.com. Each activity logged by the Garmin watch was downloaded as a separate FIT file; therefore, using the `FITfileR` package, data was imported into R. 
 
 ##### *Importing Data*
-Since each Garmin activity was downloaded as an individual FIT file, a function was created to iterate across the multiple activities and compile a single data frame. As shown below, the function was created to read each activity FIT file into R and pull out the records (which included data on latitude and longitude, distance, speed, heart rate, and cadence), and then each second of activity was merged into a single data frame. This function was applied to a list of all file names. A `for` loop was used to generate a list of data frames, and then rows were merged using `bind_rows` to create the final data frame, `marathon_df`. 
 
+First, we imported the summary data of all of Emma's training runs from July 23, 2020...
 
 ```{r, load packages}
 library(tidyverse)
 library(FITfileR)
 ```
 
+```{r}
+training_summary <- read_csv("activities/activities.csv") %>% 
+  janitor::clean_names()
+```
+
+Since each Garmin activity was downloaded as an individual FIT file, a function was created to iterate across the multiple activities and compile a single data frame. As shown below, the function was created to read each activity FIT file into R and pull out the records (which included data on latitude and longitude, distance, speed, heart rate, and cadence), and then each second of activity was merged into a single data frame. This function was applied to a list of all file names. A `for` loop was used to generate a list of data frames, and then rows were merged using `bind_rows` to create the final data frame, `marathon_df`. 
+
+
 ```{r, cache = TRUE}
-data_import <- function(list_data) {
-  
-  garmin_data <- readFitFile(list_data)
-  
-  garmin_activities_df <- records(garmin_data) %>% 
-    bind_rows() %>% 
-    arrange(timestamp)
-  
-  garmin_activities_df
-  
-}
-
-garmin_fitfiles <- "activities/fit_files/garmin_data_"
-
-list_of_fitfiles <- str_c(garmin_fitfiles, c("1":"329"), ".fit")
-
-n = 329
-datalist = list()
-datalist = vector("list", length = n)
-
-for (i in 1:n) {
-  datalist[[i]] <- data_import(list_of_fitfiles[i])
-}
-
-marathon_df <- bind_rows(datalist)
+# data_import <- function(list_data) {
+# 
+#   garmin_data <- readFitFile(list_data)
+# 
+#   garmin_activities_df <- records(garmin_data) %>%
+#     bind_rows() %>%
+#     arrange(timestamp)
+# 
+#   garmin_activities_df
+# 
+# }
+# 
+# garmin_fitfiles <- "activities/fit_files/garmin_data_"
+# 
+# list_of_fitfiles <- str_c(garmin_fitfiles, c("1":"329"), ".fit")
+# 
+# n = 329
+# datalist = list()
+# datalist = vector("list", length = n)
+# 
+# for (i in 1:n) {
+#   datalist[[i]] <- data_import(list_of_fitfiles[i])
+# }
+# 
+# marathon_df <- bind_rows(datalist)
 ```
 
 ##### *Data Cleaning*
