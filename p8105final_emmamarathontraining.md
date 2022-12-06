@@ -2,7 +2,7 @@ P8105 Final Proposal
 ================
 Gwyneth Wei (gw2442); Emma Sexton (els2250); Olivia Wang (hw2852);
 Mayuri Albal (ma4197) <br>
-2022-11-10
+12 November 2022
 
 <<<<<<< HEAD
 Title: In-depth Analysis of Emma Sexton’s Marathon Training for the New
@@ -18,7 +18,7 @@ In-depth Analysis of Emma Sexton’s New York City 2022 Marathon Training
 
 ### **Motivation**:
 
-Our motivation for this project is to analyze Emma’s training habits fro
+Our motivation for this project is to analyze Emma’s training habits for
 the New York City Marathon to better inform Emma in her future endeavors
 and to prevent future injuries.
 
@@ -31,7 +31,7 @@ and to prevent future injuries.
         mile of the marathon
 
 -   Website demonstrating the statistics and graphing models of Emma’s
-    training leading up to the marathon and during the marathon
+    training leading up to and during the marathon
 
 ### **Anticipated data sources**:
 
@@ -40,11 +40,14 @@ Data from Strava.com tracked by Garmin watch from March 31st to November
 
 ### **The planned analysis/visualizations/coding challenges**:
 
--   Analysis of marathon training reigmen prior to the race
+-   Analysis of marathon training regimen prior to the race
 
     -   Looking at temperature per day
 
-    -   Elevations at time of run
+    -   Elevations of runs
+
+    -   Assessing user comments to analyze data during times of
+        injury/illness
 
 -   Marathon statistics per mile throughout the race
 
@@ -67,7 +70,7 @@ November 12
 
 November 15-18
 
--   Projecrt review meeting
+-   Project review meeting
 
 -   Acquire data by November 18
 
