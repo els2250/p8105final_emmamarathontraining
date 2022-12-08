@@ -1,0 +1,240 @@
+---
+title: "Mapping"
+author: "Mayuri Albal"
+date: "2022-12-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r, load packages}
+library(tidyverse)
+library(FITfileR)
+library(plotly)
+library(osmdata)
+library(tmaptools)
+library(XML)
+library(readr)
+library(sf)
+library(leaflet)
+library(tigris)
+```
+
+```{r}
+training_summary <- read_csv("activities/activities.csv") %>% 
+  janitor::clean_names() %>%
+  filter(activity_type == "Run") %>%
+  select(activity_id, activity_date, activity_name, activity_description, elapsed_time_6, distance_7, max_heart_rate_8, relative_effort_9, max_speed, average_speed, elevation_gain, elevation_loss, max_grade, average_grade, max_cadence, average_cadence, average_heart_rate, calories, weather_temperature, dewpoint, humidity, wind_speed) %>%
+  filter (activity_id >= 6910869137) %>%
+  separate(activity_date, c("month_date", "year", "time"), sep = ", ") %>%
+  mutate(
+    date = str_c(month_date, year, sep = " "),
+    date = as.Date(date, format = "%b%d%Y")
+  ) %>%
+  select(-month_date, -year) %>%
+  mutate(
+    elapsed_time_min = elapsed_time_6 / 60,
+    distance_km = distance_7,
+    max_heart_rate = max_heart_rate_8,
+    relative_effort = relative_effort_9
+  ) %>%
+  select(-elapsed_time_6, -distance_7, -max_heart_rate_8, -relative_effort_9)
+
+activity_summaries =
+  training_summary %>%
+  select(activity_id, date, time, activity_name, activity_description)
+
+tidy_training = 
+  training_summary %>%
+  select(-activity_name, -activity_description) %>%
+  select(activity_id, date, time, distance_km, elapsed_time_min, max_speed, average_speed, max_heart_rate, average_heart_rate, relative_effort, everything())
+```
+
+
+```{r}
+data_import <- function(list_data) {
+
+garmin_data <- readFitFile(list_data)
+
+garmin_activities_df <- records(garmin_data) %>%
+bind_rows() %>%
+arrange(timestamp)
+
+garmin_activities_df
+}
+garmin_fitfiles <- "activities/fit_files/garmin_data_"
+
+list_of_fitfiles <- str_c(garmin_fitfiles, c("1":"329"), ".fit")
+n = 329
+datalist = list()
+datalist = vector("list", length = n)
+
+for (i in 1:n) {
+datalist[[i]] <- data_import(list_of_fitfiles[i])
+}
+
+marathon_df <- bind_rows(datalist)
+```
+
+*Mapping Attempt*
+
+```{r}
+Marathon_day=
+marathon_df %>% 
+ separate(timestamp, c("date", "time"), sep = " ") %>%
+filter(date=="2022-11-06") %>% 
+  write.csv(Marathon_day, file = "marathon_day.csv")
+  
+
+skimr::skim(Marathon_day)
+
+```
+
+
+*Start Mapping Trial*
+```{r}
+marathon_summary <- read_csv("activities/marathon_day.csv")
+
+palette.nyc <- c(
+    background = '#0850A4',
+    water = '#0850A4',
+    streets = '#3D88C7',
+    small_streets = '#3D88C7',
+    rivers = '#0850A4',
+    route = '#1B295A',
+    labels = '#3D88C7',
+    title = '#A8BACA'
+)
+gpx.file <- '2022-11-06-NYC-Marathon.gpx'
+palette <- palette.nyc
+title <- 'NYC Marathon'
+subtitle <- 'November 6, 2022'
+title.hjust <- 0 
+distance <- "km"
+```
+
+```{r}
+getbb ("New York City New York")
+```
+
+```{r}
+palette.nyc <- c(
+    background = '#0850A4',
+    water = '#0850A4',
+    streets = '#3D88C7',
+    small_streets = '#3D88C7',
+    rivers = '#0850A4',
+    route = '#1B295A',
+    labels = '#3D88C7',
+    title = '#A8BACA'
+)
+gpx.file <- 'marathon_day_gpx.gpx'
+palette <- palette.nyc
+title <- 'NYC Marathon'
+subtitle <- 'November 6, 2022'
+title.hjust <- 0 # 0 = left align; 1 = right aling
+distance <- "mi"
+```
+
+
+```{r}
+gpx <- XML::htmlTreeParse(gpx.file, 
+                     error = function (...) {}, useInternalNodes = T)
+coords <- xpathSApply(gpx, path = "//trkpt", xmlAttrs)
+lats <- as.numeric(coords["lat",])
+lons <- as.numeric(coords["lon",])
+path <- data.frame(x = lons, y = lats)
+bb <- matrix(c(min(path$x), min(path$y), max(path$x), max(path$y)),
+             nrow = 2, ncol = 2,
+             dimnames = list(c('x','y'), c('min', 'max')))
+bb
+```
+
+```{r}
+Marathon_day=
+marathon_df %>% 
+ separate(timestamp, c("date", "time"), sep = " ") %>%
+filter(date=="2022-11-06") %>% 
+mutate(
+  distance_m= distance*0.000621371
+) %>% 
+mutate(group = case_when(
+    between(distance_m, 0,0.9999) ~ "0",
+    between(distance_m, 1, 1.9999) ~ "1",
+    between(distance_m, 2, 2.9999) ~ "2",
+    between(distance_m, 3, 3.9999) ~ "3",
+    between(distance_m, 4, 4.9999) ~ "4",
+    between(distance_m, 5, 5.9999) ~ "5",
+    between(distance_m, 6, 6.9999) ~ "6",
+    between(distance_m, 7, 7.9999) ~ "7",
+    between(distance_m, 8, 8.9999) ~ "8",
+    between(distance_m, 9, 9.9999) ~ "9",
+    between(distance_m, 10, 10.9999) ~ "10",
+    between(distance_m, 11, 11.9999) ~ "11",
+    between(distance_m, 12, 12.9999) ~ "12",
+    between(distance_m, 13, 13.9999) ~ "13",
+    between(distance_m, 14, 14.9999) ~ "14",
+    between(distance_m, 15, 15.9999) ~ "15",
+    between(distance_m, 16, 2.9999) ~ "16",
+    between(distance_m, 17, 17.9999) ~ "17",
+    between(distance_m, 18, 18.9999) ~ "18",
+    between(distance_m, 19, 19.9999) ~ "19",
+    between(distance_m, 20, 20.9999) ~ "20",
+    between(distance_m, 21, 21.9999) ~ "21",
+    between(distance_m, 22, 22.9999) ~ "22",
+    between(distance_m, 23, 23.9999) ~ "23",
+    between(distance_m, 24, 24.9999) ~ "24",
+    between(distance_m, 25, 25.9999) ~ "25",
+    between(distance_m, 26, 26.9999) ~ "26")) 
+
+skimr::skim(Marathon_day)
+
+```
+
+
+```{r}
+marathon_geo=
+  Marathon_day %>% 
+  mutate(
+    latitude = position_lat,
+    longitude= position_long) %>% 
+  select(-position_lat, -position_long)
+```
+
+```{r}
+
+scatter_ggplot = 
+  Marathon_day %>%
+  ggplot(aes(x = position_lat, y = position_long, color = enhanced_speed)) +
+  geom_point(alpha = 0.25) +
+  coord_cartesian()
+
+ggplotly(scatter_ggplot)
+```
+
+```{r}
+leaflet() %>% 
+  addTiles() %>% 
+  addMarkers(data = marathon_geo)
+```
+
+```{r}
+nyc <- roads("NY", "New York")
+
+scatter_ggplot = 
+  Marathon_day %>%
+  group_by(group) %>% 
+  ggplot(aes(x =latitude, y = longitude, color = enhanced_speed)) +
+  geom_point(alpha = 0.25) +
+  geom_sf(data = nyc) + ggthemes::theme_map()
+ggplotly(scatter_ggplot)
+```
+
+```{r}
+st_bbox(Marathon_day$latitude)
+```
+
