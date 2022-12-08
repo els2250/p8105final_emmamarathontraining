@@ -195,46 +195,127 @@ skimr::skim(Marathon_day)
 
 ```
 
+```{r}
+marathon_day <- read_csv("activities/marathon_day.csv")
+
+marathon_day=
+marathon_day %>% 
+mutate(
+  distance_m= distance*0.000621371
+) %>% 
+mutate(group = case_when(
+    between(distance_m, 0,0.9999) ~ "0",
+    between(distance_m, 1, 1.9999) ~ "1",
+    between(distance_m, 2, 2.9999) ~ "2",
+    between(distance_m, 3, 3.9999) ~ "3",
+    between(distance_m, 4, 4.9999) ~ "4",
+    between(distance_m, 5, 5.9999) ~ "5",
+    between(distance_m, 6, 6.9999) ~ "6",
+    between(distance_m, 7, 7.9999) ~ "7",
+    between(distance_m, 8, 8.9999) ~ "8",
+    between(distance_m, 9, 9.9999) ~ "9",
+    between(distance_m, 10, 10.9999) ~ "10",
+    between(distance_m, 11, 11.9999) ~ "11",
+    between(distance_m, 12, 12.9999) ~ "12",
+    between(distance_m, 13, 13.9999) ~ "13",
+    between(distance_m, 14, 14.9999) ~ "14",
+    between(distance_m, 15, 15.9999) ~ "15",
+    between(distance_m, 16, 2.9999) ~ "16",
+    between(distance_m, 17, 17.9999) ~ "17",
+    between(distance_m, 18, 18.9999) ~ "18",
+    between(distance_m, 19, 19.9999) ~ "19",
+    between(distance_m, 20, 20.9999) ~ "20",
+    between(distance_m, 21, 21.9999) ~ "21",
+    between(distance_m, 22, 22.9999) ~ "22",
+    between(distance_m, 23, 23.9999) ~ "23",
+    between(distance_m, 24, 24.9999) ~ "24",
+    between(distance_m, 25, 25.9999) ~ "25",
+    between(distance_m, 26, 26.9999) ~ "26")) 
+
+```
 
 ```{r}
 marathon_geo=
-  Marathon_day %>% 
+  marathon_day %>% 
   mutate(
     latitude = position_lat,
     longitude= position_long) %>% 
   select(-position_lat, -position_long)
 ```
 
+*Using Plotly to Map Run*
 ```{r}
-
 scatter_ggplot = 
   Marathon_day %>%
   ggplot(aes(x = position_lat, y = position_long, color = enhanced_speed)) +
   geom_point(alpha = 0.25) +
-  coord_cartesian()
+  coord_cartesian()+ ggthemes::theme_map()
 
 ggplotly(scatter_ggplot)
 ```
-
+*Using Leaflet to Map Run*
 ```{r}
 leaflet() %>% 
   addTiles() %>% 
-  addMarkers(data = marathon_geo)
+  addMarkers(data = marathon_geo) %>% 
+  addProviderTiles(providers$CartoDB.Positron)
 ```
+
+```{r}
+leaflet(data=marathon_speed) %>% 
+  addTiles() %>% 
+  addMarkers(~latitude, ~longitude) %>% 
+  addProviderTiles(providers$CartoDB.Positron)
+```
+
 
 ```{r}
 nyc <- roads("NY", "New York")
 
 scatter_ggplot = 
-  Marathon_day %>%
+  marathon_geo %>%
   group_by(group) %>% 
-  ggplot(aes(x =latitude, y = longitude, color = enhanced_speed)) +
+  ggplot(aes(x = latitude, y = longitude, color = enhanced_speed)) +
   geom_point(alpha = 0.25) +
   geom_sf(data = nyc) + ggthemes::theme_map()
 ggplotly(scatter_ggplot)
 ```
 
 ```{r}
-st_bbox(Marathon_day$latitude)
+marathon_speed=
+marathon_geo %>% 
+  group_by(group) %>% 
+  mutate(
+    speed= 
+  mean(enhanced_speed)) %>% 
+  count(speed)
 ```
+
+*Aggregate Data*
+```{r}
+agg = aggregate(marathon_geo,
+                by = list(marathon_geo$group),
+                FUN = mean)
+```
+
+*Aggregate Plot*
+```{r}
+agg_ggplot = 
+  agg %>%
+  ggplot(aes(x = latitude, y = longitude, color = group)) +
+  geom_point(alpha = 0.25) +
+  coord_cartesian()+ ggthemes::theme_map()
+
+ggplotly(agg_ggplot)
+```
+*Leaflet Aggregate*
+```{r}
+leaflet() %>% 
+  addTiles() %>% 
+  addCircleMarkers(data = agg) %>% 
+  addProviderTiles(providers$CartoDB.Positron)
+
+```
+
+
 
