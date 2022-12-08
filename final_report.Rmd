@@ -121,11 +121,47 @@ Other decisions we need to make:
 
 #### Exploratory Analysis: Visualizations, summaries, and exploratory statistical analyses. Justify the steps you took, and show any major changes to your ideas.
 
-* Mileage over time (Intro)
-* Mapping running trails (plotly/gis(?))
-* Temperature vs average speed/average heart rate/relative effort
-* Elevation vs average speed/relative effort 
-* Dashboard with all our plots
+* Mileage over time (Intro) - Individual monthly or weekly mileage
+* Rounded mileage to closest mile, density plot of how many times you ran a certain mileage or violin 
+* Temperature vs average speed/average heart rate/relative effort (all of these)
+ -- * Elevation vs average speed/relative effort 
+* Mapping running trails (plotly/gis(?)) - only marathon route, map cadence/heart rate
+* Predict mph in marathon using temperature, humidity, relative effort, etc. 
+
+Side note: Rest days are not in strava data - create data set with all dates. we make a variable that is yes/no for rest days.
+
+#### Mileage over time
+
+```{r}
+
+```
+
+#### Mileage Density Plot
+
+```{r}
+
+```
+
+
+#### Choose Your Graph (Drop down list of Y and X) 
+
+```{r}
+
+```
+
+#### Marathon Route
+
+```{r}
+
+```
+
+
+#### Prediction Models
+
+```{r}
+
+```
+
 
 <br/>  
 
