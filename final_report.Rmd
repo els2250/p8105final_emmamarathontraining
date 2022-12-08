@@ -130,6 +130,39 @@ Other decisions we need to make:
 
 Side note: Rest days are not in strava data - create data set with all dates. we make a variable that is yes/no for rest days.
 
+#### Mileage over time
+
+```{r}
+
+```
+
+#### Mileage Density Plot
+
+```{r}
+
+```
+
+
+#### Choose Your Graph (Drop down list of Y and X) 
+
+```{r}
+
+```
+
+#### Marathon Route
+
+```{r}
+
+```
+
+
+#### Prediction Models
+
+```{r}
+
+```
+
+
 <br/>  
 
 #### Additional Analysis: If you undertake formal statistical analyses, describe these in detail
