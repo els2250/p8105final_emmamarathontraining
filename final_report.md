@@ -1,12 +1,8 @@
-Report
+An In-Depth Analysis of Emma Sexton’s 2022 NYC Marathon Training
 ================
 Gwyneth Wei (gw2442); Emma Sexton (els2250); Olivia Wang (hw2852);
 Mayuri Albal (ma4197) <br>
 10 December 2022
-
-### In-depth Analysis of Emma Sexton’s New York City 2022 Marathon Training
-
-<br/>
 
 #### Motivation: Provide an overview of the project goals and motivation.
 
@@ -39,16 +35,18 @@ library(tidyverse)
 ```
 
     ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
-    ## ✔ ggplot2 3.3.6      ✔ purrr   0.3.4 
+    ## ✔ ggplot2 3.4.0      ✔ purrr   0.3.5 
     ## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
-    ## ✔ tidyr   1.2.0      ✔ stringr 1.4.1 
-    ## ✔ readr   2.1.2      ✔ forcats 0.5.2 
+    ## ✔ tidyr   1.2.1      ✔ stringr 1.5.0 
+    ## ✔ readr   2.1.3      ✔ forcats 0.5.2 
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ dplyr::filter() masks stats::filter()
     ## ✖ dplyr::lag()    masks stats::lag()
 
 ``` r
 library(FITfileR)
+library(dplyr)
+library(patchwork)
 ```
 
 ``` r
@@ -56,7 +54,7 @@ training_summary <- read_csv("activities/activities.csv") %>%
   janitor::clean_names() %>%
   filter(activity_type == "Run") %>%
   select(activity_id, activity_date, activity_name, activity_description, elapsed_time_6, distance_7, max_heart_rate_8, relative_effort_9, max_speed, average_speed, elevation_gain, elevation_loss, max_grade, average_grade, max_cadence, average_cadence, average_heart_rate, calories, weather_temperature, dewpoint, humidity, wind_speed) %>%
-  filter (activity_id >= 6910869137) %>%
+  filter(activity_id >= 6910869137) %>%
   separate(activity_date, c("month_date", "year", "time"), sep = ", ") %>%
   mutate(
     date = str_c(month_date, year, sep = " "),
@@ -100,7 +98,9 @@ activity_summaries =
 tidy_training = 
   training_summary %>%
   select(-activity_name, -activity_description) %>%
-  select(activity_id, date, time, distance_km, elapsed_time_min, max_speed, average_speed, max_heart_rate, average_heart_rate, relative_effort, everything())
+  select(activity_id, date, time, distance_km, elapsed_time_min, max_speed, average_speed, max_heart_rate, average_heart_rate, relative_effort, everything()) %>% 
+  filter(date != "2022-03-31", 
+         date != "2022-04-03")
 ```
 
 Since each Garmin activity was downloaded as an individual FIT file, a
@@ -196,11 +196,255 @@ include walks and other activities (elliptical or biking)
 
 #### Exploratory Analysis: Visualizations, summaries, and exploratory statistical analyses. Justify the steps you took, and show any major changes to your ideas.
 
--   Mileage over time (Intro)
--   Mapping running trails (plotly/gis(?))
--   Temperature vs average speed/average heart rate/relative effort
--   Elevation vs average speed/relative effort
--   Dashboard with all our plots
+- Mileage over time (Intro) - Individual monthly or weekly mileage
+- Rounded mileage to closest mile, density plot of how many times you
+  ran a certain mileage or violin
+- Temperature vs average speed/average heart rate/relative effort (all
+  of these) – \* Elevation vs average speed/relative effort
+- Mapping running trails (plotly/gis(?)) - only marathon route, map
+  cadence/heart rate
+- Predict mph in marathon using temperature, humidity, relative effort,
+  etc.
+
+Side note: Rest days are not in strava data - create data set with all
+dates. we make a variable that is yes/no for rest days.
+
+#### Mileage over time
+
+``` r
+tidy_training = tidy_training %>% 
+  mutate(week = as.numeric(strftime(date, format = "%V")) - 13) %>% 
+  group_by(week) %>%
+  mutate(weekly_distance_km = sum(distance_km))
+
+tidy_training %>%
+  ggplot(aes(x = week, y = weekly_distance_km)) +
+  geom_point(color = c("#FFA500")) +
+  geom_line(color = c("#FFA500")) + 
+  labs(
+    title = "Weekly Distance Ran by Emma (km)",
+    x = "Week", 
+    y = "Distance (km)") + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 5)) + 
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 5)) +
+  theme(axis.line = element_line(color = "grey"), 
+        panel.background = element_blank(), 
+        legend.position = "none", 
+        panel.grid.major = element_line(color = "light grey", linetype = "dashed"),
+        plot.title = element_text(hjust = 0.5))
+```
+
+![](final_report_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+#### Mileage Density Plot
+
+``` r
+tidy_training %>% 
+  ggplot(aes(x = distance_km), color = c("#FFA500")) +
+  geom_density(alpha = 0.5, fill = c("#FFA500")) + 
+  labs(
+    title = "Density of Daily Distances Ran by Emma (km)",
+    x = "Distance (km)", 
+    y = "Density") + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 5)) + 
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 5)) +
+  theme(axis.line = element_line(color = "grey"), 
+        panel.background = element_blank(), 
+        legend.position = "none", 
+        panel.grid.major = element_line(color = "light grey", linetype = "dashed"),
+        plot.title = element_text(hjust = 0.5))
+```
+
+![](final_report_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+#### Choose Your Graph (Drop down list of Y and X)
+
+Temperature vs average speed/average heart rate/relative effort (all of
+these)
+
+##### Temperature vs. Average Speed
+
+``` r
+tidy_training %>% 
+  ggplot(aes(x = weather_temperature, y = average_speed)) + 
+  geom_point(color = c("#FFA500")) +
+  geom_smooth(se = FALSE, color = "dark grey") + 
+    labs(
+    title = "Temperature (C) vs. Emma's Average Speed",
+    x = "Temperature (C)", 
+    y = "Average Speed") + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 5)) + 
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 5)) +
+  theme(axis.line = element_line(color = "grey"), 
+        panel.background = element_blank(), 
+        legend.position = "none", 
+        panel.grid.major = element_line(color = "light grey", linetype = "dashed"),
+        plot.title = element_text(hjust = 0.5))
+```
+
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+    ## Warning: Removed 23 rows containing non-finite values (`stat_smooth()`).
+
+    ## Warning: Removed 23 rows containing missing values (`geom_point()`).
+
+![](final_report_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+##### Temperature as a Predictor for Emma’s Performance
+
+``` r
+temp_avg_speed = 
+  tidy_training %>% 
+  ggplot(aes(x = weather_temperature, y = average_speed)) + 
+  geom_point(color = c("#FFA500")) +
+  geom_smooth(se = FALSE, color = "dark grey") + 
+    labs(
+    x = "Temperature (C)", 
+    y = "Average Speed") + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 5)) + 
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 5)) +
+  theme(axis.line = element_line(color = "grey"), 
+        panel.background = element_blank(), 
+        legend.position = "none", 
+        panel.grid.major = element_line(color = "light grey", linetype = "dashed"),
+        plot.title = element_text(hjust = 0.5)) + 
+  ggtitle("Temperature (C) vs. Emma's Average Speed")
+
+temp_avg_hrt = 
+  tidy_training %>% 
+  ggplot(aes(x = weather_temperature, y = average_heart_rate)) + 
+  geom_point(color = c("#FFA500")) +
+  geom_smooth(se = FALSE, color = "dark grey") + 
+    labs(
+    x = "Temperature (C)", 
+    y = "Average Heart Rate (BPM)") + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 5)) + 
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 5)) +
+  theme(axis.line = element_line(color = "grey"), 
+        panel.background = element_blank(), 
+        legend.position = "none", 
+        panel.grid.major = element_line(color = "light grey", linetype = "dashed"),
+        plot.title = element_text(hjust = 0.5)) + 
+  ggtitle("Temperature (C) vs.\n Emma's Average Heart Rate (BPM)")
+
+temp_rel_effort = 
+  tidy_training %>% 
+  ggplot(aes(x = weather_temperature, y = relative_effort)) + 
+  geom_point(color = c("#FFA500")) +
+  geom_smooth(se = FALSE, color = "dark grey") + 
+    labs(
+    x = "Temperature (C)", 
+    y = "Relative Effort") + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 5)) + 
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 5)) +
+  theme(axis.line = element_line(color = "grey"), 
+        panel.background = element_blank(), 
+        legend.position = "none", 
+        panel.grid.major = element_line(color = "light grey", linetype = "dashed"),
+        plot.title = element_text(hjust = 0.5)) + 
+  ggtitle("Temperature (C) vs.\n Emma's Relative Effort")
+
+temp_avg_speed /
+(temp_avg_hrt | temp_rel_effort)
+```
+
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+    ## Warning: Removed 23 rows containing non-finite values (`stat_smooth()`).
+
+    ## Warning: Removed 23 rows containing missing values (`geom_point()`).
+
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+    ## Warning: Removed 23 rows containing non-finite values (`stat_smooth()`).
+    ## Removed 23 rows containing missing values (`geom_point()`).
+
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+    ## Warning: Removed 23 rows containing non-finite values (`stat_smooth()`).
+    ## Removed 23 rows containing missing values (`geom_point()`).
+
+![](final_report_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+##### Humidity as a Predictor for Emma’s Performance
+
+``` r
+humid_avg_speed = 
+  tidy_training %>% 
+  ggplot(aes(x = humidity, y = average_speed)) + 
+  geom_point(color = c("#FFA500")) +
+  geom_smooth(se = FALSE, color = "dark grey") + 
+    labs(
+    x = "Humidity (%)", 
+    y = "Average Speed") + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 5)) + 
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 5)) +
+  theme(axis.line = element_line(color = "grey"), 
+        panel.background = element_blank(), 
+        legend.position = "none", 
+        panel.grid.major = element_line(color = "light grey", linetype = "dashed"),
+        plot.title = element_text(hjust = 0.5)) + 
+  ggtitle("Humidity (%) vs. Emma's Average Speed")
+
+humid_avg_hrt = 
+  tidy_training %>% 
+  ggplot(aes(x = humidity, y = average_heart_rate)) + 
+  geom_point(color = c("#FFA500")) +
+  geom_smooth(se = FALSE, color = "dark grey") + 
+    labs(
+    x = "Humidity (%)", 
+    y = "Average Heart Rate (BPM)") + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 5)) + 
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 5)) +
+  theme(axis.line = element_line(color = "grey"), 
+        panel.background = element_blank(), 
+        legend.position = "none", 
+        panel.grid.major = element_line(color = "light grey", linetype = "dashed"),
+        plot.title = element_text(hjust = 0.5)) + 
+  ggtitle("Humidity (%) vs.\n Emma's Average Heart Rate (BPM)")
+
+humid_rel_effort = 
+  tidy_training %>% 
+  ggplot(aes(x = humidity, y = relative_effort)) + 
+  geom_point(color = c("#FFA500")) +
+  geom_smooth(se = FALSE, color = "dark grey") + 
+    labs(
+    x = "Humidity (%)", 
+    y = "Relative Effort") + 
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 5)) + 
+  scale_y_continuous(breaks = scales::pretty_breaks(n = 5)) +
+  theme(axis.line = element_line(color = "grey"), 
+        panel.background = element_blank(), 
+        legend.position = "none", 
+        panel.grid.major = element_line(color = "light grey", linetype = "dashed"),
+        plot.title = element_text(hjust = 0.5)) + 
+  ggtitle("Humidity (%) vs.\n Emma's Relative Effort")
+
+humid_avg_speed /
+(humid_avg_hrt | humid_rel_effort)
+```
+
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+    ## Warning: Removed 23 rows containing non-finite values (`stat_smooth()`).
+
+    ## Warning: Removed 23 rows containing missing values (`geom_point()`).
+
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+    ## Warning: Removed 23 rows containing non-finite values (`stat_smooth()`).
+    ## Removed 23 rows containing missing values (`geom_point()`).
+
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+    ## Warning: Removed 23 rows containing non-finite values (`stat_smooth()`).
+    ## Removed 23 rows containing missing values (`geom_point()`).
+
+![](final_report_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+#### Marathon Route
+
+#### Prediction Models
 
 <br/>
 
