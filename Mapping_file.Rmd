@@ -317,12 +317,19 @@ leaflet() %>%
 ```
 
 ```{r}
+pal <- colorFactor(c("orange"), domain=c(group.1))
+```
+
+```{r}
 leaflet() %>% 
   addTiles() %>% 
   addCircleMarkers(data = agg,
              lng = ~longitude,
              lat = ~latitude,
              label = ~Group.1,
+             radius = 7,
+             color= "orange",
+             stroke = TRUE, fillOpacity = 0.75,
              popup = ~paste("Mile:", Group.1,
                             "<br>Speed:", enhanced_speed,
                             "<br>HR:", heart_rate,
