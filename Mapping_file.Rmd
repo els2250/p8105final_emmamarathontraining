@@ -204,7 +204,7 @@ mutate(
   distance_m= distance*0.000621371
 ) %>% 
 mutate(group = case_when(
-    between(distance_m, 0,0.9999) ~ "0",
+    between(distance_m, 0,0.9999) ~ "Start",
     between(distance_m, 1, 1.9999) ~ "1",
     between(distance_m, 2, 2.9999) ~ "2",
     between(distance_m, 3, 3.9999) ~ "3",
@@ -230,7 +230,7 @@ mutate(group = case_when(
     between(distance_m, 23, 23.9999) ~ "23",
     between(distance_m, 24, 24.9999) ~ "24",
     between(distance_m, 25, 25.9999) ~ "25",
-    between(distance_m, 26, 26.9999) ~ "26")) 
+    between(distance_m, 26, 26.9999) ~ "26-Finish")) 
 
 ```
 
@@ -314,8 +314,74 @@ leaflet() %>%
   addTiles() %>% 
   addCircleMarkers(data = agg) %>% 
   addProviderTiles(providers$CartoDB.Positron)
+```
 
+```{r}
+leaflet() %>% 
+  addTiles() %>% 
+  addCircleMarkers(data = agg,
+             lng = ~longitude,
+             lat = ~latitude,
+             label = ~Group.1,
+             popup = ~paste("Mile:", Group.1,
+                            "<br>Speed:", enhanced_speed,
+                            "<br>HR:", heart_rate,
+                             "<br>Cadence:", cadence,
+                            "<br>Altitude:", enhanced_altitude)) %>% 
+  addProviderTiles(providers$CartoDB.Positron)
 ```
 
 
+*Markers*
+```{r}
+library(htmltools)
+
+mt_marker <- read.csv(textConnection(
+"Mile,Lat, Long
+Start, 40.60189,-74.06020
+Mile 1, 40.61043,-74.03462
+Mile 2, 40.61926,-74.02884,
+Mile 3,
+Mile 4,
+Mile 5,
+Mile 6,
+Mile 7,
+Mile 8,
+Mile 9,
+Mile 10,
+Mile 11, 
+Mile 12,
+Mile 13,
+Mile 14,
+Mile 15,
+Mile 16,
+Mile 17, 
+Mile 18,
+Mile 19,
+Mile 20,
+Mile 21,
+Mile 22,
+Mile 23,
+Mile 24,
+Mile 25,
+Mile 26,
+Finish))
+
+leaflet(mt_marker) %>% addTiles() %>%
+  addCircleMarkers(~Long, ~Lat, label = ~htmlEscape(Mile))
+```
+
+
+```{r}
+agg_x=
+  agg %>% 
+  mutate(
+    mile = Group.1) %>% 
+  mutate(
+    mile_count = recode(mile,
+      '00' = 'Start')
+    '1'= "Mile 1") '2'= "Mile 2", '3'= "Mile 3", '4'= "Mile 4",
+      '5'= "Mile 5", '6'= "Mile 6", '7'= "Mile 7", '8'= "Mile 8", '9'= "Mile 9", 
+      '10' = "Mile 10", '11' = "Mile 11",'12' = "Mile 12", '13'= "Mile 13", '14'= "Mile 14", '15'="Mile 15", '16'= "Mile 16",'17'= "Mile 17", '18'= "Mile 18", '19'= "Mile 19",'20'= "Mile 20", '21'= "Mile 21", '22' = "Mile 22", '23' = "Mile 23", '24'= "Mile 24", '25'= "Mile 25", '26'= "Finish")
+```
 
