@@ -11,22 +11,34 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #### Motivation: Provide an overview of the project goals and motivation.
 
+Running a marathon requires an immense amount of time, effort, and dedication. First-time marathon runners are forced to make decisions with little knowledge of what to expect. Being ill-prepared and over-training are two common experiences that occur during training and on race day. Emma, one of our group members, ran the New York City Marathon (NYCM) this past fall, which was her first marathon. After completing the marathon on November 6th, Emma was prepared to start training for the next one. Therefore, we are interested in understanding the impact of external factors, such as temperature, wind, elevation, etc., on Emma's speed and performance during the marathon, while also considering how training changed over time in order to improve her training for next marathon.
+
 <br/>  
 
 #### Related Work: Anything that inspired you, such as a paper, a web site, or something we discussed in class.
+
+This year, the NYCM was considered the hottest marathon since 1986. With temperatures in the mid-70s for most of the race, participants were encouraged to focus on hydrating and maintaining electrolytes in order to maintain their speed and finish the race. Most runners - beginners and experts alike - were struggling with the heat during race day, causing adverse health outcomes and decreased performance ([Runner's World Article](https://www.runnersworld.com/news/a41956910/strava-data-2022-nyc-marathon/)). Emma's experiences before and during the race inspired us to investigate her marathon training data. During the marathon, Emma felt the effects of the heat on her performance, and watched numerous people collapse mid-race. Emma also had her own battles with training prior to the marathon most likely due to over-training.
+
+Upon receiving Emma's data from Strava.com, we noticed that the data was clean and organized, allowing for easy generation of visuals. After reviewing the data, we recognized that we could conduct analyses from different vantage points, such as reviewing the average elements for each run or using per-second data to generate interactive maps. Inspired by our in-class work using `ggplot`, `plot.ly`, and additional visualization techniques, we are able to comprehensively investigate Emma's training and race day data. Lastly, we hope to use modeling to understand the interactions of different factors on Emma's performance, which will hopefully inform her training efforts in the future. 
 
 <br/>  
 
 #### Initial Questions: What questions are you trying to answer? How did these questions evolve over the course of the project? What new questions did you consider in the course of your analysis?
 
+
+
 <br/>  
 
 #### Data: Source, scraping method, cleaning, etc.
-Data was collected using the Garmin Forerunner 245 activity watch from August 17, 2020 to November 6, 2022. Collected data was uploaded to Strava.com after each activity. After granting permission, personal data was downloaded from Strava.com. Each activity logged by the Garmin watch was downloaded as a separate FIT file; therefore, using the `FITfileR` package, data was imported into R. 
+
+Data was collected using the Garmin Forerunner 245 activity watch from July 23, 2020 to November 6, 2022. Collected data was uploaded to Strava.com after each activity. After granting permission, personal data was downloaded from Strava.com. Summary data for each activity post was saved in the form of a `.csv` file (imported using `tidyverse`) and per-second data for each activity was compiled and saved in a `.fit` file (imported using `FITfileR`). 
 
 ##### *Importing Data*
 
-First, we imported the summary data of all of Emma's training runs from July 23, 2020...
+First, we imported the summary data of all of Emma's training runs from July 23, 2020 to November 6, 2022. In order to clean this data, we:
+
+1. Sorted data to include only information from the time that Emma started training for the NYCM, which was on April 4, 2022
+2. Selected the necessary variables
 
 ```{r, load packages}
 library(tidyverse)
@@ -35,7 +47,6 @@ library(dplyr)
 library(patchwork)
 library(leaflet)
 ```
-
 
 
 ```{r}
@@ -347,10 +358,10 @@ Loading and Cleaning the Data
 ```{r}
 marathon_day <- read_csv("activities/marathon_day.csv")
 
-marathon_day=
+marathon_day =
 marathon_day %>% 
 mutate(
-  distance_m= distance*0.000621371
+  distance_m = distance*0.000621371
 ) %>% 
 mutate(group = case_when(
     between(distance_m, 0,0.9999) ~ "Start",
@@ -384,20 +395,20 @@ mutate(group = case_when(
 
 Recode
 ```{r}
-marathon_geo=
+marathon_geo =
   marathon_day %>% 
   mutate(
-    latitude = position_lat,
-    longitude= position_long) %>% 
+    latitude  = position_lat,
+    longitude = position_long) %>% 
   select(-position_lat, -position_long)
 ```
 
 ```{r}
-marathon_speed=
+marathon_speed =
 marathon_geo %>% 
   group_by(group) %>% 
   mutate(
-    speed= 
+    speed = 
   mean(enhanced_speed))
 ```
 
@@ -418,7 +429,7 @@ leaflet() %>%
              lat = ~latitude,
              label = ~Group.1,
              radius = 7,
-             color= "orange",
+             color = "orange",
              stroke = TRUE, fillOpacity = 0.75,
              popup = ~paste("Mile:", Group.1,
                             "<br>Speed:", enhanced_speed,
