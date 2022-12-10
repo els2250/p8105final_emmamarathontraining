@@ -410,7 +410,7 @@ agg = aggregate(marathon_geo,
 
 Aggregate Leaflet Plot
 
-```{r}
+```{echo = FALSE, results='asis', warning=FALSE, message=FALSE}
 leaflet() %>% 
   addTiles() %>% 
   addCircleMarkers(data = agg,

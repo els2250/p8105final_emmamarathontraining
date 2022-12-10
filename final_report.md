@@ -35,10 +35,10 @@ library(tidyverse)
 ```
 
     ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
-    ## ✔ ggplot2 3.4.0      ✔ purrr   0.3.5 
+    ## ✔ ggplot2 3.3.6      ✔ purrr   0.3.4 
     ## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
-    ## ✔ tidyr   1.2.1      ✔ stringr 1.5.0 
-    ## ✔ readr   2.1.3      ✔ forcats 0.5.2 
+    ## ✔ tidyr   1.2.0      ✔ stringr 1.4.1 
+    ## ✔ readr   2.1.2      ✔ forcats 0.5.2 
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ dplyr::filter() masks stats::filter()
     ## ✖ dplyr::lag()    masks stats::lag()
@@ -47,6 +47,7 @@ library(tidyverse)
 library(FITfileR)
 library(dplyr)
 library(patchwork)
+library(leaflet)
 ```
 
 ``` r
@@ -196,15 +197,15 @@ include walks and other activities (elliptical or biking)
 
 #### Exploratory Analysis: Visualizations, summaries, and exploratory statistical analyses. Justify the steps you took, and show any major changes to your ideas.
 
-- Mileage over time (Intro) - Individual monthly or weekly mileage
-- Rounded mileage to closest mile, density plot of how many times you
-  ran a certain mileage or violin
-- Temperature vs average speed/average heart rate/relative effort (all
-  of these) – \* Elevation vs average speed/relative effort
-- Mapping running trails (plotly/gis(?)) - only marathon route, map
-  cadence/heart rate
-- Predict mph in marathon using temperature, humidity, relative effort,
-  etc.
+-   Mileage over time (Intro) - Individual monthly or weekly mileage
+-   Rounded mileage to closest mile, density plot of how many times you
+    ran a certain mileage or violin
+-   Temperature vs average speed/average heart rate/relative effort (all
+    of these) – \* Elevation vs average speed/relative effort
+-   Mapping running trails (plotly/gis(?)) - only marathon route, map
+    cadence/heart rate
+-   Predict mph in marathon using temperature, humidity, relative
+    effort, etc.
 
 Side note: Rest days are not in strava data - create data set with all
 dates. we make a variable that is yes/no for rest days.
@@ -282,11 +283,11 @@ tidy_training %>%
         plot.title = element_text(hjust = 0.5))
 ```
 
-    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
-    ## Warning: Removed 23 rows containing non-finite values (`stat_smooth()`).
+    ## Warning: Removed 23 rows containing non-finite values (stat_smooth).
 
-    ## Warning: Removed 23 rows containing missing values (`geom_point()`).
+    ## Warning: Removed 23 rows containing missing values (geom_point).
 
 ![](final_report_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
@@ -348,21 +349,21 @@ temp_avg_speed /
 (temp_avg_hrt | temp_rel_effort)
 ```
 
-    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
-    ## Warning: Removed 23 rows containing non-finite values (`stat_smooth()`).
+    ## Warning: Removed 23 rows containing non-finite values (stat_smooth).
 
-    ## Warning: Removed 23 rows containing missing values (`geom_point()`).
+    ## Warning: Removed 23 rows containing missing values (geom_point).
 
-    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
-    ## Warning: Removed 23 rows containing non-finite values (`stat_smooth()`).
-    ## Removed 23 rows containing missing values (`geom_point()`).
+    ## Warning: Removed 23 rows containing non-finite values (stat_smooth).
+    ## Removed 23 rows containing missing values (geom_point).
 
-    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
-    ## Warning: Removed 23 rows containing non-finite values (`stat_smooth()`).
-    ## Removed 23 rows containing missing values (`geom_point()`).
+    ## Warning: Removed 23 rows containing non-finite values (stat_smooth).
+    ## Removed 23 rows containing missing values (geom_point).
 
 ![](final_report_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
@@ -424,27 +425,34 @@ humid_avg_speed /
 (humid_avg_hrt | humid_rel_effort)
 ```
 
-    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
-    ## Warning: Removed 23 rows containing non-finite values (`stat_smooth()`).
+    ## Warning: Removed 23 rows containing non-finite values (stat_smooth).
 
-    ## Warning: Removed 23 rows containing missing values (`geom_point()`).
+    ## Warning: Removed 23 rows containing missing values (geom_point).
 
-    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
-    ## Warning: Removed 23 rows containing non-finite values (`stat_smooth()`).
-    ## Removed 23 rows containing missing values (`geom_point()`).
+    ## Warning: Removed 23 rows containing non-finite values (stat_smooth).
+    ## Removed 23 rows containing missing values (geom_point).
 
-    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+    ## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
 
-    ## Warning: Removed 23 rows containing non-finite values (`stat_smooth()`).
-    ## Removed 23 rows containing missing values (`geom_point()`).
+    ## Warning: Removed 23 rows containing non-finite values (stat_smooth).
+    ## Removed 23 rows containing missing values (geom_point).
 
 ![](final_report_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 #### Marathon Route
 
 #### Prediction Models
+
+-   Mileage over time (Intro)
+-   Mapping running trails (plotly/gis(?)) Map marathon route and the
+    average speed per mile
+-   Temperature vs average speed/average heart rate/relative effort
+-   Elevation vs average speed/relative effort
+-   Dashboard with all our plots
 
 <br/>
 
@@ -453,3 +461,184 @@ humid_avg_speed /
 <br/>
 
 #### Discussion: What were your findings? Are they what you expect? What insights into the data can you make?
+
+*Map of Marathon Route with Averages* NOTE: Install Leaflet Prior to
+Running
+
+Loading and Cleaning the Data
+
+``` r
+marathon_day <- read_csv("activities/marathon_day.csv")
+```
+
+    ## New names:
+    ## Rows: 3402 Columns: 12
+    ## ── Column specification
+    ## ──────────────────────────────────────────────────────── Delimiter: "," dbl
+    ## (9): ...1, position_lat, position_long, distance, heart_rate, cadence, ... lgl
+    ## (1): speed date (1): date time (1): time
+    ## ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
+    ## Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    ## • `` -> `...1`
+
+``` r
+marathon_day=
+marathon_day %>% 
+mutate(
+  distance_m= distance*0.000621371
+) %>% 
+mutate(group = case_when(
+    between(distance_m, 0,0.9999) ~ "Start",
+    between(distance_m, 1, 1.9999) ~ "1",
+    between(distance_m, 2, 2.9999) ~ "2",
+    between(distance_m, 3, 3.9999) ~ "3",
+    between(distance_m, 4, 4.9999) ~ "4",
+    between(distance_m, 5, 5.9999) ~ "5",
+    between(distance_m, 6, 6.9999) ~ "6",
+    between(distance_m, 7, 7.9999) ~ "7",
+    between(distance_m, 8, 8.9999) ~ "8",
+    between(distance_m, 9, 9.9999) ~ "9",
+    between(distance_m, 10, 10.9999) ~ "10",
+    between(distance_m, 11, 11.9999) ~ "11",
+    between(distance_m, 12, 12.9999) ~ "12",
+    between(distance_m, 13, 13.9999) ~ "13",
+    between(distance_m, 14, 14.9999) ~ "14",
+    between(distance_m, 15, 15.9999) ~ "15",
+    between(distance_m, 16, 2.9999) ~ "16",
+    between(distance_m, 17, 17.9999) ~ "17",
+    between(distance_m, 18, 18.9999) ~ "18",
+    between(distance_m, 19, 19.9999) ~ "19",
+    between(distance_m, 20, 20.9999) ~ "20",
+    between(distance_m, 21, 21.9999) ~ "21",
+    between(distance_m, 22, 22.9999) ~ "22",
+    between(distance_m, 23, 23.9999) ~ "23",
+    between(distance_m, 24, 24.9999) ~ "24",
+    between(distance_m, 25, 25.9999) ~ "25",
+    between(distance_m, 26, 26.9999) ~ "26-Finish")) 
+```
+
+Recode
+
+``` r
+marathon_geo=
+  marathon_day %>% 
+  mutate(
+    latitude = position_lat,
+    longitude= position_long) %>% 
+  select(-position_lat, -position_long)
+```
+
+``` r
+marathon_speed=
+marathon_geo %>% 
+  group_by(group) %>% 
+  mutate(
+    speed= 
+  mean(enhanced_speed))
+```
+
+Aggregate Data
+
+``` r
+agg = aggregate(marathon_geo,
+                by = list(marathon_geo$group),
+                FUN = mean)
+```
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+    ## Warning in mean.default(X[[i]], ...): argument is not numeric or logical:
+    ## returning NA
+
+Aggregate Leaflet Plot
+
+``` echo
+leaflet() %>% 
+  addTiles() %>% 
+  addCircleMarkers(data = agg,
+             lng = ~longitude,
+             lat = ~latitude,
+             label = ~Group.1,
+             radius = 7,
+             color= "orange",
+             stroke = TRUE, fillOpacity = 0.75,
+             popup = ~paste("Mile:", Group.1,
+                            "<br>Speed:", enhanced_speed,
+                            "<br>HR:", heart_rate,
+                             "<br>Cadence:", cadence,
+                            "<br>Altitude:", enhanced_altitude)) %>% 
+  addProviderTiles(providers$CartoDB.Positron)
+```
